@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conversation Transcriber</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f3;
+      --bg-tertiary: #eeede9;
+      --text-primary: #1a1a18;
+      --text-secondary: #6b6b67;
+      --text-tertiary: #a0a09b;
+      --border-light: rgba(0,0,0,0.10);
+      --border-mid: rgba(0,0,0,0.18);
+      --border-strong: rgba(0,0,0,0.28);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --blue-bg: #E6F1FB; --blue-text: #0C447C;
+      --teal-bg: #E1F5EE; --teal-text: #085041;
+      --amber-bg: #FAEEDA; --amber-text: #633806;
+      --purple-bg: #EEEDFE; --purple-text: #3C3489;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #1e1e1c;
+        --bg-secondary: #2a2a28;
+        --bg-tertiary: #313130;
+        --text-primary: #e8e8e4;
+        --text-secondary: #a0a09b;
+        --text-tertiary: #6b6b67;
+        --border-light: rgba(255,255,255,0.08);
+        --border-mid: rgba(255,255,255,0.14);
+        --border-strong: rgba(255,255,255,0.22);
+        --blue-bg: #0c2d4a; --blue-text: #85B7EB;
+        --teal-bg: #0a2a20; --teal-text: #5DCAA5;
+        --amber-bg: #2e1f08; --amber-text: #EF9F27;
+        --purple-bg: #1e1b40; --purple-text: #AFA9EC;
+      }
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 24px 20px;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .app-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-right: auto;
+    }
+
+    .status {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-tertiary);
+      flex-shrink: 0;
+    }
+
+    .dot.rec {
+      background: #e24b4a;
+      animation: blink 1.2s infinite;
+    }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    .timer {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+      min-width: 36px;
+    }
+
+    .btn {
+      padding: 7px 15px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-mid);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 13px;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: background 0.12s, opacity 0.12s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { background: var(--bg-secondary); }
+    .btn:active { transform: scale(0.98); }
+
+    .btn.primary {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      border-color: transparent;
+    }
+
+    .btn.primary:hover { opacity: 0.82; }
+
+    .btn.sm {
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .speaker-sel {
+      padding: 5px 9px;
+      border: 0.5px solid var(--border-light);
+      border-radius: var(--radius-md);
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-family: var(--font);
+      cursor: pointer;
+    }
+
+    .api-key-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding: 10px 14px;
+      background: var(--bg-primary);
+      border: 0.5px solid var(--border-light);
+      border-radius: var(--radius-lg);
+    }
+
+    .api-key-row label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .api-key-row input {
+      flex: 1;
+      padding: 5px 10px;
+      border: 0.5px solid var(--border-mid);
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: var(--font);
+      outline: none;
+    }
+
+    .api-key-row input:focus { border-color: var(--border-strong); }
+
+    .api-key-note {
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    .cols {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 720px) {
+      .cols { grid-template-columns: 1fr; }
+    }
+
+    .col { display: flex; flex-direction: column; gap: 8px; }
+
+    .col-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 8px;
+      border-bottom: 0.5px solid var(--border-light);
+    }
+
+    .col-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .col-actions { display: flex; gap: 6px; }
+
+    .panel {
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      min-height: 420px;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text-primary);
+      overflow-y: auto;
+      max-height: 560px;
+    }
+
+    .panel-empty {
+      color: var(--text-tertiary);
+      font-style: italic;
+      font-size: 13px;
+    }
+
+    .utterance { margin-bottom: 14px; }
+
+    .spk {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 10px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .s1 { background: var(--blue-bg); color: var(--blue-text); }
+    .s2 { background: var(--teal-bg); color: var(--teal-text); }
+    .s3 { background: var(--amber-bg); color: var(--amber-text); }
+    .s4 { background: var(--purple-bg); color: var(--purple-text); }
+
+    .utext {
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .notes-area {
+      width: 100%;
+      min-height: 420px;
+      max-height: 560px;
+      resize: vertical;
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text-primary);
+      font-family: var(--font);
+      outline: none;
+    }
+
+    .notes-area:focus { border-color: var(--border-mid); }
+
+    .loading {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 4px 0;
+    }
+
+    .spin {
+      width: 13px;
+      height: 13px;
+      border: 1.5px solid var(--border-mid);
+      border-top-color: var(--text-secondary);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <span class="app-title">Conversation Transcriber</span>
+    <select class="speaker-sel" id="speakerCount">
+      <option value="1">1 speaker</option>
+      <option value="2" selected>2 speakers</option>
+      <option value="3">3 speakers</option>
+      <option value="4">4 speakers</option>
+    </select>
+    <button class="btn primary" id="btnRec" onclick="startRec()">Start recording</button>
+    <button class="btn" id="btnStop" onclick="stopRec()" disabled>Stop</button>
+    <button class="btn" onclick="document.getElementById('fileIn').click()">Upload audio</button>
+    <input type="file" id="fileIn" accept="audio/*" style="display:none" onchange="handleFile(event)">
+    <span class="timer" id="timer"></span>
+    <span class="status"><span class="dot" id="dot"></span><span id="statusTxt">Idle</span></span>
+  </div>
+
+  <div class="api-key-row">
+    <label for="apiKey">Anthropic API key</label>
+    <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off" />
+    <span class="api-key-note">Stored in memory only — never sent anywhere except api.anthropic.com</span>
+  </div>
+
+  <div class="cols">
+    <div class="col">
+      <div class="col-head">
+        <span class="col-label">Transcript</span>
+        <div class="col-actions">
+          <button class="btn sm" onclick="exportTxt('transcript')">Export</button>
+          <button class="btn sm" onclick="clearCol('transcript')">Clear</button>
+        </div>
+      </div>
+      <div class="loading" id="loadTrans"><div class="spin"></div> Transcribing...</div>
+      <div class="panel" id="transcriptPanel">
+        <span class="panel-empty">Transcript will appear here after recording or uploading audio.</span>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="col-head">
+        <span class="col-label">Summary</span>
+        <div class="col-actions">
+          <button class="btn sm" onclick="generateSummary()">Generate</button>
+          <button class="btn sm" onclick="exportTxt('summary')">Export</button>
+        </div>
+      </div>
+      <div class="loading" id="loadSumm"><div class="spin"></div> Summarising...</div>
+      <div class="panel" id="summaryPanel">
+        <span class="panel-empty">Click "Generate" after transcribing to create an AI summary.</span>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="col-head">
+        <span class="col-label">Notes &amp; actions</span>
+        <div class="col-actions">
+          <button class="btn sm" onclick="exportTxt('notes')">Export</button>
+          <button class="btn sm" onclick="document.getElementById('notesArea').value=''">Clear</button>
+        </div>
+      </div>
+      <textarea class="notes-area" id="notesArea" placeholder="Enter your notes, action points, follow-ups..."></textarea>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let recorder = null, chunks = [], timerInt = null, secs = 0;
+  let transcriptData = [];
+  const SCOL = ['s1','s2','s3','s4'];
+  const SNAMES = ['Speaker A','Speaker B','Speaker C','Speaker D'];
+
+  function getKey() {
+    const k = document.getElementById('apiKey').value.trim();
+    if (!k) { alert('Please enter your Anthropic API key above.'); return null; }
+    return k;
+  }
+
+  function setStatus(txt, rec) {
+    document.getElementById('statusTxt').textContent = txt;
+    document.getElementById('dot').className = 'dot' + (rec ? ' rec' : '');
+  }
+
+  function fmt(s) {
+    return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+  }
+
+  function startRec() {
+    if (!getKey()) return;
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      chunks = [];
+      recorder = new MediaRecorder(stream);
+      recorder.ondataavailable = e => chunks.push(e.data);
+      recorder.onstop = () => { processAudio(null, chunks); stream.getTracks().forEach(t => t.stop()); };
+      recorder.start(1000);
+      secs = 0;
+      timerInt = setInterval(() => { secs++; document.getElementById('timer').textContent = fmt(secs); }, 1000);
+      document.getElementById('btnRec').disabled = true;
+      document.getElementById('btnStop').disabled = false;
+      setStatus('Recording', true);
+    }).catch(() => alert('Microphone access denied or unavailable.'));
+  }
+
+  function stopRec() {
+    if (recorder && recorder.state !== 'inactive') recorder.stop();
+    clearInterval(timerInt);
+    document.getElementById('timer').textContent = '';
+    document.getElementById('btnRec').disabled = false;
+    document.getElementById('btnStop').disabled = true;
+    setStatus('Processing...', false);
+  }
+
+  function handleFile(e) {
+    const file = e.target.files[0];
+    if (file) processAudio(file, null);
+    e.target.value = '';
+  }
+
+  async function processAudio(file, chunks) {
+    const key = getKey();
+    if (!key) return;
+    const n = parseInt(document.getElementById('speakerCount').value);
+    const loader = document.getElementById('loadTrans');
+    loader.style.display = 'flex';
+    setStatus('Transcribing...', false);
+
+    let b64 = '', mime = 'audio/webm';
+    try {
+      if (file) { mime = file.type || 'audio/mpeg'; b64 = await toB64(file); }
+      else if (chunks && chunks.length) { b64 = await toB64(new Blob(chunks, { type: 'audio/webm' })); }
+      else { loader.style.display = 'none'; setStatus('No audio', false); return; }
+    } catch(err) {
+      loader.style.display = 'none';
+      alert('Could not read audio: ' + err.message);
+      return;
+    }
+
+    const names = SNAMES.slice(0, n).join(', ');
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 2000,
+          messages: [{ role: 'user', content: [
+            { type: 'text', text: `Transcribe this audio conversation. There are ${n} speaker(s): ${names}. Return ONLY a JSON array, no markdown, no explanation. Each element: {"speaker":"Speaker A","text":"what they said"}. Label turns by speaker.` },
+            { type: 'document', source: { type: 'base64', media_type: mime, data: b64 } }
+          ]}]
+        })
+      });
+      const d = await res.json();
+      if (d.error) { throw new Error(d.error.message); }
+      const raw = (d.content||[]).map(c=>c.text||'').join('');
+      try { transcriptData = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+      catch { transcriptData = [{ speaker: 'Speaker A', text: raw }]; }
+      renderTranscript();
+      setStatus('Done', false);
+    } catch(err) {
+      setStatus('Error', false);
+      alert('Transcription failed: ' + err.message);
+    }
+    loader.style.display = 'none';
+  }
+
+  function renderTranscript() {
+    const el = document.getElementById('transcriptPanel');
+    const map = {};
+    let idx = 0;
+    el.innerHTML = transcriptData.map(u => {
+      if (!(u.speaker in map)) map[u.speaker] = idx++;
+      return `<div class="utterance"><span class="spk ${SCOL[map[u.speaker]%4]}">${u.speaker}</span><div class="utext">${u.text}</div></div>`;
+    }).join('');
+  }
+
+  async function generateSummary() {
+    if (!transcriptData.length) { alert('No transcript yet — transcribe audio first.'); return; }
+    const key = getKey();
+    if (!key) return;
+    const loader = document.getElementById('loadSumm');
+    const panel = document.getElementById('summaryPanel');
+    loader.style.display = 'flex';
+    panel.innerHTML = '';
+    const txt = transcriptData.map(u => `${u.speaker}: ${u.text}`).join('\n');
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{ role: 'user', content: `Summarise this conversation. Include: overview (2-3 sentences), key points, and any decisions or action items. Be concise.\n\n${txt}` }]
+        })
+      });
+      const d = await res.json();
+      if (d.error) throw new Error(d.error.message);
+      const summary = (d.content||[]).map(c=>c.text||'').join('');
+      panel.style.whiteSpace = 'pre-wrap';
+      panel.textContent = summary;
+    } catch(err) {
+      panel.textContent = 'Summary failed: ' + err.message;
+    }
+    loader.style.display = 'none';
+  }
+
+  function clearCol(col) {
+    if (col === 'transcript') {
+      transcriptData = [];
+      document.getElementById('transcriptPanel').innerHTML = '<span class="panel-empty">Transcript will appear here after recording or uploading audio.</span>';
+    }
+    if (col === 'summary') {
+      document.getElementById('summaryPanel').innerHTML = '<span class="panel-empty">Click "Generate" after transcribing to create an AI summary.</span>';
+    }
+  }
+
+  function exportTxt(col) {
+    let txt = '', filename = col + '.txt';
+    if (col === 'transcript') {
+      if (!transcriptData.length) { alert('Nothing to export.'); return; }
+      txt = transcriptData.map(u => `[${u.speaker}]\n${u.text}`).join('\n\n');
+    } else if (col === 'summary') {
+      txt = document.getElementById('summaryPanel').textContent.trim();
+      if (!txt || txt.startsWith('Click')) { alert('No summary to export.'); return; }
+    } else if (col === 'notes') {
+      txt = document.getElementById('notesArea').value.trim();
+      if (!txt) { alert('No notes to export.'); return; }
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' }));
+    a.download = filename;
+    a.click();
+  }
+
+  function toB64(blob) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result.split(',')[1]);
+      r.onerror = rej;
+      r.readAsDataURL(blob);
+    });
+  }
+</script>
+</body>
+</html>
