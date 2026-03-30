@@ -7,26 +7,31 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg-page: #000;
-      --bg-bar: #0d0d0d;
-      --col1: #c0d9b8;
-      --col2: #a8c5a0;
-      --col3: #8fb387;
-      --head1: #5c7d56;
-      --head2: #4a6645;
-      --head3: #3a5235;
-      --tg: #a8c5a0;
-      --tm: #6e9467;
-      --td: #3a5c35;
-      --bg: rgba(168,197,160,0.22);
+      --bg: #000; --bar: #0d0d0d; --card: #111811;
+      --col1: #c0d9b8; --col2: #a8c5a0; --col3: #8fb387;
+      --h1: #5c7d56; --h2: #4a6645; --h3: #3a5235;
+      --tg: #a8c5a0; --tm: #6e9467; --td: #3a5c35;
+      --border: rgba(168,197,160,0.22);
+      --rm: 8px; --rl: 12px;
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --rmd: 8px; --rlg: 12px;
     }
-    body { font-family: var(--font); background: var(--bg-page); color: var(--tg); min-height: 100vh; padding: 18px 20px; }
+    body { font-family: var(--font); background: var(--bg); color: var(--tg); min-height: 100vh; padding: 18px 20px; }
     .app { max-width: 1220px; margin: 0 auto; }
 
-    /* session row */
-    .srow { display:flex; align-items:center; gap:10px; margin-bottom:10px; padding:10px 16px; background:var(--bg-bar); border:1px solid var(--bg); border-radius:var(--rlg); }
+    /* ── nav bar ── */
+    .navbar { display:flex; align-items:center; gap:10px; margin-bottom:10px; padding:10px 16px; background:var(--bar); border:1px solid var(--border); border-radius:var(--rl); }
+    .nav-brand { font-size:13px; font-weight:500; color:var(--tg); letter-spacing:.06em; text-transform:uppercase; display:flex; align-items:center; gap:7px; margin-right:auto; }
+    .nav-dot { width:7px; height:7px; border-radius:50%; background:#6e9467; }
+    .nav-btn { padding:5px 14px; border-radius:var(--rm); border:1px solid var(--td); background:transparent; color:var(--td); font-size:12px; cursor:pointer; font-family:var(--font); transition:all .15s; }
+    .nav-btn:hover, .nav-btn.active { border-color:var(--tm); color:var(--tg); background:var(--td); }
+    .nav-btn.active { background:#2a3d2a; border-color:var(--tm); color:var(--tg); }
+
+    /* ── pages ── */
+    .page { display:none; }
+    .page.active { display:block; }
+
+    /* ── session row ── */
+    .srow { display:flex; align-items:center; gap:10px; margin-bottom:10px; padding:10px 16px; background:var(--bar); border:1px solid var(--border); border-radius:var(--rl); }
     .srow label { font-size:11px; color:var(--tm); white-space:nowrap; text-transform:uppercase; letter-spacing:.06em; }
     .sinput { flex:1; background:transparent; border:none; outline:none; font-size:15px; font-weight:500; color:var(--tg); font-family:var(--font); border-bottom:1px solid var(--td); }
     .sinput::placeholder { color:var(--td); font-weight:400; }
@@ -39,39 +44,26 @@
     .save-ind { font-size:11px; color:var(--td); }
     .save-ind.ok { color:#6e9467; }
 
-    /* topbar */
-    .topbar { display:flex; align-items:center; gap:8px; margin-bottom:10px; padding:10px 14px; background:var(--bg-bar); border:1px solid var(--bg); border-radius:var(--rlg); flex-wrap:wrap; }
-    .atitle { font-size:13px; font-weight:500; color:var(--tg); letter-spacing:.06em; text-transform:uppercase; margin-right:auto; display:flex; align-items:center; gap:7px; }
-    .tdot { width:7px; height:7px; border-radius:50%; background:#6e9467; flex-shrink:0; }
+    /* ── topbar ── */
+    .topbar { display:flex; align-items:center; gap:8px; margin-bottom:10px; padding:10px 14px; background:var(--bar); border:1px solid var(--border); border-radius:var(--rl); flex-wrap:wrap; }
     .status { font-size:12px; color:var(--tm); display:flex; align-items:center; gap:5px; }
     .dot { width:7px; height:7px; border-radius:50%; background:var(--td); flex-shrink:0; }
     .dot.rec { background:#f87171; animation:blink 1.2s infinite; }
     .dot.paused { background:#fbbf24; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
     .timer { font-size:12px; color:var(--tg); font-variant-numeric:tabular-nums; min-width:38px; }
-
-    /* speaker switcher */
-    .spk-switcher { display:flex; align-items:center; gap:6px; }
-    .spk-switcher label { font-size:11px; color:var(--tm); }
-    .spk-btn { padding:4px 10px; font-size:11px; border-radius:var(--rmd); border:1px solid var(--td); background:transparent; color:var(--td); cursor:pointer; font-family:var(--font); transition:all .15s; }
-    .spk-btn.active { background:#6e9467; border-color:#6e9467; color:#000; font-weight:500; }
-    .spk-btn:hover:not(.active) { border-color:var(--tm); color:var(--tm); }
-
-    /* meter */
     .meter-wrap { display:flex; align-items:center; gap:3px; }
-    .mb { width:3px; height:4px; border-radius:2px; background:var(--td); transition:background .08s, height .08s; }
+    .mb { width:3px; height:4px; border-radius:2px; background:var(--td); transition:background .08s,height .08s; }
+    .warn-box { padding:10px 14px; background:#2d1a00; border:1px solid #92400e; border-radius:var(--rl); font-size:13px; color:#fbbf24; margin-bottom:10px; display:none; }
 
-    /* speech not supported warning */
-    .warn-box { padding:10px 14px; background:#2d1a00; border:1px solid #92400e; border-radius:var(--rlg); font-size:13px; color:#fbbf24; margin-bottom:10px; display:none; }
-
-    /* buttons */
-    .btn { padding:6px 13px; border-radius:var(--rmd); border:1px solid var(--tm); background:transparent; color:var(--tg); font-size:12px; cursor:pointer; font-family:var(--font); transition:background .12s; white-space:nowrap; }
+    /* ── buttons ── */
+    .btn { padding:6px 13px; border-radius:var(--rm); border:1px solid var(--tm); background:transparent; color:var(--tg); font-size:12px; cursor:pointer; font-family:var(--font); transition:background .12s; white-space:nowrap; }
     .btn:hover { background:var(--td); }
     .btn:active { transform:scale(.98); }
     .btn.primary { background:#6e9467; color:#000; border-color:#6e9467; font-weight:500; }
     .btn.primary:hover { background:#a8c5a0; border-color:#a8c5a0; }
-    .btn.warn { background:#7f1d1d; color:#fca5a5; border-color:#991b1b; }
-    .btn.warn:hover { background:#991b1b; }
+    .btn.danger { background:#7f1d1d; color:#fca5a5; border-color:#991b1b; }
+    .btn.danger:hover { background:#991b1b; }
     .btn.blue { background:#1e3a5f; color:#93c5fd; border-color:#1d4ed8; }
     .btn.blue:hover { background:#1d3a5c; }
     .btn.sm { padding:3px 8px; font-size:11px; }
@@ -79,64 +71,18 @@
     .col-head .btn { background:rgba(0,0,0,.18); color:#000; border-color:rgba(0,0,0,.28); font-size:11px; padding:3px 8px; }
     .col-head .btn:hover { background:rgba(0,0,0,.32); }
 
-    /* api key */
-    .akrow { display:flex; align-items:center; gap:10px; margin-bottom:10px; padding:8px 14px; background:var(--bg-bar); border:1px solid var(--bg); border-radius:var(--rlg); flex-wrap:wrap; }
+    /* ── speaker select / api key ── */
+    .sel { padding:5px 8px; border:1px solid var(--tm); border-radius:var(--rm); background:#0d0d0d; color:var(--tg); font-size:12px; font-family:var(--font); outline:none; }
+    .akrow { display:flex; align-items:center; gap:10px; margin-bottom:10px; padding:8px 14px; background:var(--bar); border:1px solid var(--border); border-radius:var(--rl); flex-wrap:wrap; }
     .akrow label { font-size:12px; color:var(--tm); white-space:nowrap; }
-    .akrow input { flex:1; min-width:180px; padding:5px 9px; border:1px solid var(--td); border-radius:var(--rmd); background:#0a0a0a; color:var(--tg); font-size:13px; font-family:var(--font); outline:none; }
+    .akrow input { flex:1; min-width:180px; padding:5px 9px; border:1px solid var(--td); border-radius:var(--rm); background:#0a0a0a; color:var(--tg); font-size:13px; font-family:var(--font); outline:none; }
     .akrow input:focus { border-color:var(--tm); }
     .aknote { font-size:11px; color:var(--td); }
 
-    /* columns */
-    .cols { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr); gap:12px; }
-    @media(max-width:760px){ .cols { grid-template-columns:1fr; } }
-    .col { display:flex; flex-direction:column; border-radius:var(--rlg); overflow:hidden; border:1px solid rgba(0,0,0,.2); }
-    .col-head { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; flex-wrap:wrap; gap:5px; }
-    .col:nth-child(1) .col-head { background:var(--head1); }
-    .col:nth-child(2) .col-head { background:var(--head2); }
-    .col:nth-child(3) .col-head { background:var(--head3); }
-    .col-label { font-size:11px; font-weight:600; color:#000; letter-spacing:.08em; text-transform:uppercase; }
-    .col-actions { display:flex; gap:4px; flex-wrap:wrap; }
-
-    .panel { flex:1; padding:12px; min-height:440px; font-size:13px; line-height:1.7; color:#000; overflow-y:auto; max-height:560px; }
-    .col:nth-child(1) .panel { background:var(--col1); }
-    .col:nth-child(2) .panel { background:var(--col2); }
-    .col:nth-child(3) .panel { background:var(--col3); }
-    .panel-empty { color:rgba(0,0,0,.35); font-style:italic; font-size:13px; }
-
-    .loading { display:none; align-items:center; gap:7px; font-size:12px; color:rgba(0,0,0,.5); padding:5px 12px; }
-    .col:nth-child(1) .loading { background:var(--col1); }
-    .col:nth-child(2) .loading { background:var(--col2); }
-    .col:nth-child(3) .loading { background:var(--col3); }
-    .spin { width:12px; height:12px; border:1.5px solid rgba(0,0,0,.2); border-top-color:rgba(0,0,0,.5); border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-
-    /* utterances */
-    .utterance { margin-bottom:12px; }
-    .utt-meta { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
-    .spk { font-size:11px; font-weight:600; padding:2px 8px; border-radius:10px; color:#000; }
-    .s0 { background:rgba(0,0,0,.14); }
-    .s1 { background:rgba(0,0,0,.24); }
-    .s2 { background:rgba(0,0,0,.10); }
-    .s3 { background:rgba(0,0,0,.20); }
-    .ts { font-size:10px; color:rgba(0,0,0,.4); font-variant-numeric:tabular-nums; }
-    .utext { font-size:13px; color:#000; line-height:1.6; }
-
-    /* interim (live unfinished line) */
-    .interim-line { font-size:13px; color:rgba(0,0,0,.4); font-style:italic; line-height:1.6; padding:6px 0 2px; border-top:1px dashed rgba(0,0,0,.15); margin-top:8px; }
-    .interim-line::before { content:'● '; font-style:normal; font-size:10px; }
-
-    /* notes */
-    .notes-area { flex:1; width:100%; min-height:440px; max-height:560px; resize:none; background:var(--col3); border:none; outline:none; padding:12px; font-size:13px; line-height:1.7; color:#000; font-family:var(--font); }
-    .notes-area::placeholder { color:rgba(0,0,0,.32); }
-
-    /* toast */
-    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(16px); background:#a8c5a0; color:#000; font-size:13px; font-weight:500; padding:7px 18px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity .2s,transform .2s; z-index:100; }
-    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-
-    /* speaker selector bar */
-    .spk-bar { display:none; align-items:center; gap:8px; margin-bottom:10px; padding:9px 14px; background:var(--bg-bar); border:1px solid var(--bg); border-radius:var(--rlg); flex-wrap:wrap; }
+    /* ── speaker bar ── */
+    .spk-bar { display:none; align-items:center; gap:8px; margin-bottom:10px; padding:9px 14px; background:var(--bar); border:1px solid var(--border); border-radius:var(--rl); flex-wrap:wrap; }
     .spk-bar.visible { display:flex; }
-    .spk-bar-label { font-size:11px; color:var(--tm); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; }
+    .spk-bar-lbl { font-size:11px; color:var(--tm); text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; }
     .spk-pill { padding:5px 14px; border-radius:20px; border:1px solid var(--td); background:transparent; color:var(--td); font-size:12px; cursor:pointer; font-family:var(--font); transition:all .15s; }
     .spk-pill.active { color:#000; font-weight:500; border-color:transparent; }
     .spk-pill:nth-child(2).active { background:#a8c5a0; }
@@ -144,125 +90,252 @@
     .spk-pill:nth-child(4).active { background:#c8e4c0; }
     .spk-pill:nth-child(5).active { background:#5c9e5c; }
     .spk-pill:hover:not(.active) { border-color:var(--tm); color:var(--tm); }
+
+    /* ── columns ── */
+    .cols { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr); gap:12px; }
+    @media(max-width:760px){ .cols { grid-template-columns:1fr; } }
+    .col { display:flex; flex-direction:column; border-radius:var(--rl); overflow:hidden; border:1px solid rgba(0,0,0,.2); }
+    .col-head { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; flex-wrap:wrap; gap:5px; }
+    .col:nth-child(1) .col-head { background:var(--h1); }
+    .col:nth-child(2) .col-head { background:var(--h2); }
+    .col:nth-child(3) .col-head { background:var(--h3); }
+    .col-label { font-size:11px; font-weight:600; color:#000; letter-spacing:.08em; text-transform:uppercase; }
+    .col-actions { display:flex; gap:4px; flex-wrap:wrap; }
+    .panel { flex:1; padding:12px; min-height:440px; font-size:13px; line-height:1.7; color:#000; overflow-y:auto; max-height:560px; }
+    .col:nth-child(1) .panel { background:var(--col1); }
+    .col:nth-child(2) .panel { background:var(--col2); }
+    .col:nth-child(3) .panel { background:var(--col3); }
+    .panel-empty { color:rgba(0,0,0,.35); font-style:italic; font-size:13px; }
+    .loading { display:none; align-items:center; gap:7px; font-size:12px; color:rgba(0,0,0,.5); padding:5px 12px; }
+    .col:nth-child(1) .loading { background:var(--col1); }
+    .col:nth-child(2) .loading { background:var(--col2); }
+    .col:nth-child(3) .loading { background:var(--col3); }
+    .spin { width:12px; height:12px; border:1.5px solid rgba(0,0,0,.2); border-top-color:rgba(0,0,0,.5); border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .utterance { margin-bottom:12px; }
+    .utt-meta { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
+    .spk { font-size:11px; font-weight:600; padding:2px 8px; border-radius:10px; color:#000; }
+    .s0 { background:rgba(0,0,0,.14); } .s1 { background:rgba(0,0,0,.24); } .s2 { background:rgba(0,0,0,.10); } .s3 { background:rgba(0,0,0,.20); }
+    .ts { font-size:10px; color:rgba(0,0,0,.4); font-variant-numeric:tabular-nums; }
+    .utext { font-size:13px; color:#000; line-height:1.6; }
+    .interim-line { font-size:13px; color:rgba(0,0,0,.4); font-style:italic; line-height:1.6; padding:6px 0 2px; border-top:1px dashed rgba(0,0,0,.15); margin-top:8px; }
+    .interim-line::before { content:'● '; font-style:normal; font-size:10px; }
+    .notes-area { flex:1; width:100%; min-height:440px; max-height:560px; resize:none; background:var(--col3); border:none; outline:none; padding:12px; font-size:13px; line-height:1.7; color:#000; font-family:var(--font); }
+    .notes-area::placeholder { color:rgba(0,0,0,.32); }
+
+    /* ── HISTORY PAGE ── */
+    .hist-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
+    .hist-header h2 { font-size:16px; font-weight:500; color:var(--tg); }
+    .hist-search { padding:7px 12px; border:1px solid var(--td); border-radius:var(--rm); background:#0a0a0a; color:var(--tg); font-size:13px; font-family:var(--font); outline:none; width:240px; }
+    .hist-search:focus { border-color:var(--tm); }
+    .hist-search::placeholder { color:var(--td); }
+    .hist-empty { text-align:center; padding:60px 20px; color:var(--td); font-size:14px; }
+    .hist-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:14px; }
+    .hist-card {
+      background:var(--card); border:1px solid var(--border); border-radius:var(--rl);
+      overflow:hidden; transition:border-color .15s;
+    }
+    .hist-card:hover { border-color:var(--tm); }
+    .hist-card-head { padding:12px 14px; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .hist-card-title { font-size:14px; font-weight:500; color:var(--tg); line-height:1.3; }
+    .hist-card-date { font-size:11px; color:var(--td); white-space:nowrap; margin-top:2px; }
+    .hist-card-meta { display:flex; gap:8px; padding:8px 14px; flex-wrap:wrap; }
+    .hist-pill { font-size:11px; padding:2px 8px; border-radius:10px; background:rgba(168,197,160,.12); color:var(--tm); border:1px solid var(--border); }
+    .hist-card-preview { padding:8px 14px 12px; font-size:12px; color:var(--td); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .hist-card-actions { display:flex; gap:6px; padding:10px 14px; border-top:1px solid var(--border); background:rgba(0,0,0,.2); }
+
+    /* ── SESSION DETAIL (history view) ── */
+    .detail-back { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+    .detail-title { font-size:18px; font-weight:500; color:var(--tg); margin-bottom:4px; }
+    .detail-date { font-size:12px; color:var(--td); margin-bottom:16px; }
+    .detail-tabs { display:flex; gap:4px; margin-bottom:12px; background:#111; border:1px solid var(--border); border-radius:var(--rm); padding:4px; width:fit-content; }
+    .detail-tab { padding:5px 16px; border-radius:6px; border:none; background:transparent; color:var(--td); font-size:13px; cursor:pointer; font-family:var(--font); transition:all .15s; }
+    .detail-tab.active { background:var(--h2); color:#000; font-weight:500; }
+    .detail-panel { background:var(--card); border:1px solid var(--border); border-radius:var(--rl); padding:16px; min-height:300px; max-height:500px; overflow-y:auto; font-size:13px; line-height:1.7; color:var(--tg); white-space:pre-wrap; }
+    .detail-panel .utterance { margin-bottom:12px; }
+    .detail-panel .utt-meta { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
+    .detail-panel .utext { color:var(--tg); font-size:13px; line-height:1.6; }
+    .detail-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+
+    /* ── modals ── */
+    .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,.78); z-index:200; align-items:center; justify-content:center; }
+    .modal-bg.open { display:flex; }
+    .modal { background:#0f1a0f; border:1px solid var(--border); border-radius:var(--rl); padding:22px; width:520px; max-width:90vw; display:flex; flex-direction:column; gap:12px; }
+    .modal h3 { font-size:14px; font-weight:500; color:var(--tg); }
+    .modal p { font-size:12px; color:var(--tm); line-height:1.6; }
+    .modal textarea { width:100%; height:200px; background:#0a0a0a; border:1px solid var(--td); border-radius:var(--rm); padding:10px; color:var(--tg); font-size:13px; font-family:var(--font); resize:vertical; outline:none; line-height:1.6; }
+    .modal textarea:focus { border-color:var(--tm); }
+    .modal-actions { display:flex; gap:8px; justify-content:flex-end; }
+
+    /* ── toast ── */
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(16px); background:#a8c5a0; color:#000; font-size:13px; font-weight:500; padding:7px 18px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity .2s,transform .2s; z-index:300; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* ── save session button highlight ── */
+    .save-session-row { display:flex; justify-content:flex-end; margin-bottom:10px; }
   </style>
 </head>
 <body>
 <div class="app">
 
-  <div class="srow">
-    <label>Session</label>
-    <input class="sinput" id="sessionTitle" type="text" placeholder="Untitled session — click to name" maxlength="80" />
-    <span class="tog-wrap" onclick="toggleAutosave()">
-      <span class="tog" id="asTrack"><span class="tog-th"></span></span>Auto-save
-    </span>
-    <span class="save-ind" id="saveInd"></span>
+  <!-- nav -->
+  <div class="navbar">
+    <span class="nav-brand"><span class="nav-dot"></span>Conversation Transcriber</span>
+    <button class="nav-btn active" id="navTranscribe" onclick="showPage('transcribe')">Transcribe</button>
+    <button class="nav-btn" id="navHistory" onclick="showPage('history')">History <span id="histCount" style="font-size:10px;opacity:.7;"></span></button>
   </div>
 
-  <div class="warn-box" id="warnBox">
-    Your browser doesn't support the Web Speech API. Try Chrome or Edge for live transcription. You can still upload audio files for transcription via Claude.
-  </div>
+  <!-- ══════════ TRANSCRIBE PAGE ══════════ -->
+  <div class="page active" id="pageTranscribe">
 
-  <div class="topbar">
-    <span class="atitle"><span class="tdot"></span>Conversation Transcriber</span>
-    <select id="speakerCount" style="padding:5px 8px;border:1px solid var(--tm);border-radius:var(--rmd);background:#0d0d0d;color:var(--tg);font-size:12px;font-family:var(--font);outline:none;">
-      <option value="1">1 speaker</option>
-      <option value="2" selected>2 speakers</option>
-      <option value="3">3 speakers</option>
-      <option value="4">4 speakers</option>
-    </select>
-    <button class="btn primary" id="btnRec" onclick="startRec()">Start recording</button>
-    <button class="btn" id="btnPause" onclick="togglePause()" disabled>Pause</button>
-    <button class="btn warn" id="btnStop" onclick="stopRec()" disabled>Stop</button>
-    <button class="btn blue" id="btnAnalyse" onclick="analyseTranscript()" disabled title="Send transcript to Claude for confidence review">Analyse with AI</button>
-    <button class="btn" onclick="openPasteModal()">Paste transcript</button>
-    <div class="meter-wrap" id="meterWrap">
-      <div class="mb" id="mb0"></div><div class="mb" id="mb1"></div><div class="mb" id="mb2"></div><div class="mb" id="mb3"></div>
-      <div class="mb" id="mb4"></div><div class="mb" id="mb5"></div><div class="mb" id="mb6"></div><div class="mb" id="mb7"></div>
-    </div>
-    <span class="timer" id="timer"></span>
-    <span class="status"><span class="dot" id="dot"></span><span id="statusTxt">Idle</span></span>
-  </div>
-
-  <!-- speaker switcher — shown during recording -->
-  <div class="spk-bar" id="spkBar">
-    <span class="spk-bar-label">Speaking now:</span>
-    <button class="spk-pill active" id="spkBtn0" onclick="setActiveSpeaker(0)">Speaker A</button>
-    <button class="spk-pill" id="spkBtn1" onclick="setActiveSpeaker(1)">Speaker B</button>
-    <button class="spk-pill" id="spkBtn2" onclick="setActiveSpeaker(2)" style="display:none">Speaker C</button>
-    <button class="spk-pill" id="spkBtn3" onclick="setActiveSpeaker(3)" style="display:none">Speaker D</button>
-    <span style="font-size:11px;color:var(--td);margin-left:4px;">Click to switch who is speaking</span>
-  </div>
-
-  <div class="akrow">
-    <label for="apiKey">Anthropic API key</label>
-    <input type="password" id="apiKey" placeholder="sk-ant-... (needed for AI analysis & summary)" autocomplete="off" />
-    <span class="aknote">Used for summary + AI analysis only — live transcription runs in your browser</span>
-  </div>
-
-  <div class="cols">
-    <div class="col">
-      <div class="col-head">
-        <span class="col-label">Transcript <span id="liveTag" style="font-size:10px;font-weight:400;opacity:.7;display:none;">· live</span></span>
-        <div class="col-actions">
-          <button class="btn sm" onclick="exportTxt('transcript')">Export</button>
-          <button class="btn sm" onclick="clearCol('transcript')">Clear</button>
-        </div>
-      </div>
-      <div class="loading" id="loadTrans"><div class="spin"></div> <span id="loadTxt">Analysing...</span></div>
-      <div class="panel" id="transcriptPanel">
-        <span class="panel-empty">Transcript appears here in real time as you speak. Use the speaker switcher above to label who is talking.</span>
-      </div>
+    <div class="srow">
+      <label>Session</label>
+      <input class="sinput" id="sessionTitle" type="text" placeholder="Untitled session — click to name" maxlength="80" />
+      <span class="tog-wrap" onclick="toggleAutosave()">
+        <span class="tog" id="asTrack"><span class="tog-th"></span></span>Auto-save
+      </span>
+      <span class="save-ind" id="saveInd"></span>
     </div>
 
-    <div class="col">
-      <div class="col-head">
-        <span class="col-label">Summary</span>
-        <div class="col-actions">
-          <button class="btn sm" onclick="generateSummary()">Generate</button>
-          <button class="btn sm" onclick="exportTxt('summary')">Export</button>
-          <button class="btn sm" onclick="clearCol('summary')">Clear</button>
-        </div>
+    <div class="warn-box" id="warnBox">Your browser doesn't support live transcription. Try Chrome or Edge.</div>
+
+    <div class="topbar">
+      <select class="sel" id="speakerCount">
+        <option value="1">1 speaker</option>
+        <option value="2" selected>2 speakers</option>
+        <option value="3">3 speakers</option>
+        <option value="4">4 speakers</option>
+      </select>
+      <button class="btn primary" id="btnRec" onclick="startRec()">Start recording</button>
+      <button class="btn" id="btnPause" onclick="togglePause()" disabled>Pause</button>
+      <button class="btn danger" id="btnStop" onclick="stopRec()" disabled>Stop</button>
+      <button class="btn blue" id="btnAnalyse" onclick="analyseTranscript()" disabled>Analyse with AI</button>
+      <button class="btn" onclick="openPasteModal()">Paste transcript</button>
+      <button class="btn primary" onclick="saveSessionToHistory()" id="btnSave" title="Save current session to History">Save to history</button>
+      <button class="btn" onclick="exportAll()" title="Export transcript, summary and notes as a single .txt file">Export all</button>
+      <div class="meter-wrap">
+        <div class="mb" id="mb0"></div><div class="mb" id="mb1"></div><div class="mb" id="mb2"></div><div class="mb" id="mb3"></div>
+        <div class="mb" id="mb4"></div><div class="mb" id="mb5"></div><div class="mb" id="mb6"></div><div class="mb" id="mb7"></div>
       </div>
-      <div class="loading" id="loadSumm"><div class="spin"></div> Summarising...</div>
-      <div class="panel" id="summaryPanel">
-        <span class="panel-empty">Click "Generate" after recording to create an AI summary with timestamps.</span>
-      </div>
+      <span class="timer" id="timer"></span>
+      <span class="status"><span class="dot" id="dot"></span><span id="statusTxt">Idle</span></span>
     </div>
 
-    <div class="col">
-      <div class="col-head">
-        <span class="col-label">Notes &amp; actions</span>
-        <div class="col-actions">
-          <button class="btn sm" onclick="copyNotes()">Copy</button>
-          <button class="btn sm" onclick="exportTxt('notes')">Export</button>
-          <button class="btn sm" onclick="document.getElementById('notesArea').value='';autoSave()">Clear</button>
+    <div class="spk-bar" id="spkBar">
+      <span class="spk-bar-lbl">Speaking now:</span>
+      <button class="spk-pill active" id="spkBtn0" onclick="setActiveSpeaker(0)">Speaker A</button>
+      <button class="spk-pill" id="spkBtn1" onclick="setActiveSpeaker(1)">Speaker B</button>
+      <button class="spk-pill" id="spkBtn2" onclick="setActiveSpeaker(2)" style="display:none">Speaker C</button>
+      <button class="spk-pill" id="spkBtn3" onclick="setActiveSpeaker(3)" style="display:none">Speaker D</button>
+      <span style="font-size:11px;color:var(--td);margin-left:4px;">Click to switch speaker</span>
+    </div>
+
+    <div class="akrow">
+      <label for="apiKey">Anthropic API key</label>
+      <input type="password" id="apiKey" placeholder="sk-ant-... (for AI analysis & summary only)" autocomplete="off" />
+      <span class="aknote">Live transcription is free — key only needed for AI analysis &amp; summary</span>
+    </div>
+
+    <div class="cols">
+      <div class="col">
+        <div class="col-head">
+          <span class="col-label">Transcript <span id="liveTag" style="font-size:10px;font-weight:400;opacity:.7;display:none;">· live</span></span>
+          <div class="col-actions">
+            <button class="btn sm" onclick="exportTxt('transcript')">Export</button>
+            <button class="btn sm" onclick="clearCol('transcript')">Clear</button>
+          </div>
+        </div>
+        <div class="loading" id="loadTrans"><div class="spin"></div> <span id="loadTxt">Analysing...</span></div>
+        <div class="panel" id="transcriptPanel"><span class="panel-empty">Transcript appears here in real time. Use the speaker switcher to label who is talking.</span></div>
+      </div>
+      <div class="col">
+        <div class="col-head">
+          <span class="col-label">Summary</span>
+          <div class="col-actions">
+            <button class="btn sm" onclick="generateSummary()">Generate</button>
+            <button class="btn sm" onclick="exportTxt('summary')">Export</button>
+            <button class="btn sm" onclick="clearCol('summary')">Clear</button>
+          </div>
+        </div>
+        <div class="loading" id="loadSumm"><div class="spin"></div> Summarising...</div>
+        <div class="panel" id="summaryPanel"><span class="panel-empty">Click "Generate" after recording to create an AI summary with timestamps.</span></div>
+      </div>
+      <div class="col">
+        <div class="col-head">
+          <span class="col-label">Notes &amp; actions</span>
+          <div class="col-actions">
+            <button class="btn sm" onclick="copyNotes()">Copy</button>
+            <button class="btn sm" onclick="exportTxt('notes')">Export</button>
+            <button class="btn sm" onclick="document.getElementById('notesArea').value='';autoSave()">Clear</button>
+          </div>
+        </div>
+        <textarea class="notes-area" id="notesArea" placeholder="Enter notes, actions, follow-ups...&#10;&#10;Tip: Copy then paste into Windows Sticky Notes (Win+W)" oninput="autoSave()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ HISTORY PAGE ══════════ -->
+  <div class="page" id="pageHistory">
+
+    <!-- list view -->
+    <div id="histList">
+      <div class="hist-header">
+        <h2>Session history</h2>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input class="hist-search" id="histSearch" placeholder="Search sessions..." oninput="renderHistory()" />
+          <button class="btn danger sm" onclick="confirmClearAll()">Clear all</button>
         </div>
       </div>
-      <textarea class="notes-area" id="notesArea"
-        placeholder="Enter notes, actions, follow-ups...&#10;&#10;Tip: Copy then paste into Windows Sticky Notes (Win+W)"
-        oninput="autoSave()"></textarea>
+      <div id="histGrid" class="hist-grid"></div>
+    </div>
+
+    <!-- detail view -->
+    <div id="histDetail" style="display:none;">
+      <div class="detail-back">
+        <button class="btn sm" onclick="showHistList()">← Back</button>
+        <span style="font-size:12px;color:var(--td);">Session detail</span>
+      </div>
+      <div class="detail-title" id="detTitle"></div>
+      <div class="detail-date" id="detDate"></div>
+      <div class="detail-tabs">
+        <button class="detail-tab active" onclick="switchDetailTab('transcript')">Transcript</button>
+        <button class="detail-tab" onclick="switchDetailTab('summary')">Summary</button>
+        <button class="detail-tab" onclick="switchDetailTab('notes')">Notes</button>
+      </div>
+      <div class="detail-panel" id="detPanel"></div>
+      <div class="detail-actions">
+        <button class="btn primary" onclick="restoreSession()">Restore to editor</button>
+        <button class="btn sm" onclick="exportDetail('transcript')">Export transcript</button>
+        <button class="btn sm" onclick="exportDetail('summary')">Export summary</button>
+        <button class="btn sm" onclick="exportDetail('notes')">Export notes</button>
+        <button class="btn danger sm" onclick="deleteCurrentDetail()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- paste modal -->
+<div class="modal-bg" id="pasteModal">
+  <div class="modal">
+    <h3>Paste existing transcript</h3>
+    <p>Paste transcript text below — one line per turn. Use "Analyse with AI" after importing to add speaker labels and confidence flags.</p>
+    <textarea id="pasteArea" placeholder="Paste transcript text here..."></textarea>
+    <div class="modal-actions">
+      <button class="btn" onclick="closePasteModal()">Cancel</button>
+      <button class="btn primary" onclick="importPaste()">Import</button>
     </div>
   </div>
 </div>
 
-<style>
-  #pasteModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200; align-items:center; justify-content:center; }
-  .paste-card { background:#111a11; border:1px solid var(--bg); border-radius:var(--rlg); padding:20px; width:520px; max-width:90vw; display:flex; flex-direction:column; gap:12px; }
-  .paste-card h3 { font-size:14px; font-weight:500; color:var(--tg); }
-  .paste-card p { font-size:12px; color:var(--tm); line-height:1.6; }
-  #pasteArea { width:100%; height:200px; background:#0a0a0a; border:1px solid var(--td); border-radius:var(--rmd); padding:10px; color:var(--tg); font-size:13px; font-family:var(--font); resize:vertical; outline:none; line-height:1.6; }
-  #pasteArea:focus { border-color:var(--tm); }
-  .paste-actions { display:flex; gap:8px; justify-content:flex-end; }
-</style>
-
-<div id="pasteModal">
-  <div class="paste-card">
-    <h3>Paste existing transcript</h3>
-    <p>Paste any existing transcript text below — one line per sentence or turn. Use "Analyse with AI" after importing to add speaker labels and confidence flags.</p>
-    <textarea id="pasteArea" placeholder="Paste transcript text here..."></textarea>
-    <div class="paste-actions">
-      <button class="btn" onclick="closePasteModal()">Cancel</button>
-      <button class="btn primary" onclick="importPaste()">Import</button>
+<!-- confirm modal -->
+<div class="modal-bg" id="confirmModal">
+  <div class="modal">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p id="confirmMsg"></p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeConfirm()">Cancel</button>
+      <button class="btn danger" id="confirmOk" onclick="">Confirm</button>
     </div>
   </div>
 </div>
@@ -270,48 +343,54 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const SNAMES = ['Speaker A','Speaker B','Speaker C','Speaker D'];
-  const SCLS   = ['s0','s1','s2','s3'];
-  const STORAGE_KEY = 'transcriber_v2';
+  const SCLS=['s0','s1','s2','s3'];
+  const SNAMES=['Speaker A','Speaker B','Speaker C','Speaker D'];
+  const CURR_KEY='transcriber_current';
+  const HIST_KEY='transcriber_history';
 
-  let recognition = null, isRecognising = false, isPaused = false;
-  let transcriptData = [];
-  let activeSpeaker = 0, numSpeakers = 2;
-  let timerInt = null, secs = 0;
-  let audioCtx = null, analyser = null, meterRaf = null;
-  let autosaveOn = false, autosaveTimer = null;
-  let interimEl = null;
+  let recognition=null, isRecognising=false, isPaused=false;
+  let transcriptData=[], activeSpeaker=0, numSpeakers=2;
+  let timerInt=null, secs=0;
+  let audioCtx=null, analyser=null, meterRaf=null;
+  let autosaveOn=false, autosaveTimer=null;
+  let interimEl=null;
+  let currentDetailId=null, currentDetailTab='transcript', currentDetailData=null;
 
-  /* ── speech api check ── */
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) document.getElementById('warnBox').style.display = 'block';
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR) document.getElementById('warnBox').style.display='block';
+
+  /* ── page nav ── */
+  function showPage(p){
+    document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+    document.getElementById('page'+p.charAt(0).toUpperCase()+p.slice(1)).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('nav'+p.charAt(0).toUpperCase()+p.slice(1)).classList.add('active');
+    if(p==='history'){ showHistList(); renderHistory(); }
+  }
 
   /* ── utils ── */
-  function fmt(s) { return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
-  function getKey() { return document.getElementById('apiKey').value.trim(); }
-  function showToast(m) {
-    const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),2200);
-  }
-  function setStatus(txt,mode) {
+  function fmt(s){s=s||0;return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+  function getKey(){return document.getElementById('apiKey').value.trim();}
+  function escHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+  function setStatus(txt,mode){
     document.getElementById('statusTxt').textContent=txt;
-    const d=document.getElementById('dot');
-    d.className='dot'+(mode==='rec'?' rec':mode==='paused'?' paused':'');
+    document.getElementById('dot').className='dot'+(mode==='rec'?' rec':mode==='paused'?' paused':'');
   }
 
-  /* ── auto-save ── */
-  function toggleAutosave() {
+  /* ── auto-save (current session) ── */
+  function toggleAutosave(){
     autosaveOn=!autosaveOn;
     document.getElementById('asTrack').classList.toggle('on',autosaveOn);
     if(autosaveOn){autoSave();showToast('Auto-save on');}
     else{document.getElementById('saveInd').textContent='';showToast('Auto-save off');}
   }
-  function autoSave() {
+  function autoSave(){
     if(!autosaveOn) return;
     clearTimeout(autosaveTimer);
     autosaveTimer=setTimeout(()=>{
-      try {
-        localStorage.setItem(STORAGE_KEY,JSON.stringify({
+      try{
+        localStorage.setItem(CURR_KEY,JSON.stringify({
           title:document.getElementById('sessionTitle').value,
           transcript:transcriptData,
           summary:document.getElementById('summaryPanel').textContent,
@@ -322,41 +401,250 @@
         ind.textContent='Saved '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
         ind.className='save-ind ok';
         setTimeout(()=>{ind.className='save-ind';},3000);
-      } catch(e){}
+      }catch(e){}
     },1200);
   }
-  function loadSaved() {
-    try {
-      const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return;
+  function loadCurrent(){
+    try{
+      const raw=localStorage.getItem(CURR_KEY);if(!raw)return;
       const d=JSON.parse(raw);
       if(d.title) document.getElementById('sessionTitle').value=d.title;
       if(d.transcript&&d.transcript.length){transcriptData=d.transcript;renderTranscript();}
       if(d.summary&&!d.summary.startsWith('Click')){
-        const p=document.getElementById('summaryPanel'); p.style.whiteSpace='pre-wrap'; p.textContent=d.summary;
+        const p=document.getElementById('summaryPanel');p.style.whiteSpace='pre-wrap';p.textContent=d.summary;
       }
       if(d.notes) document.getElementById('notesArea').value=d.notes;
       if(d.savedAt) document.getElementById('saveInd').textContent='Restored '+new Date(d.savedAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    } catch(e){}
+    }catch(e){}
+  }
+
+  /* ── HISTORY STORE ── */
+  function getHistory(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]');}catch(e){return[];}}
+  function saveHistory(arr){localStorage.setItem(HIST_KEY,JSON.stringify(arr));}
+
+  function saveSessionToHistory(){
+    const title=document.getElementById('sessionTitle').value.trim()||'Untitled session';
+    const summary=document.getElementById('summaryPanel').textContent.trim();
+    const notes=document.getElementById('notesArea').value.trim();
+    if(!transcriptData.length&&!summary&&!notes){
+      showToast('Nothing to save yet');return;
+    }
+    const hist=getHistory();
+    const id='s_'+Date.now();
+    hist.unshift({
+      id, title,
+      transcript:transcriptData,
+      summary: summary.startsWith('Click')?'':summary,
+      notes,
+      savedAt:new Date().toISOString(),
+      wordCount: transcriptData.reduce((a,u)=>a+(u.text?u.text.split(' ').length:0),0)
+    });
+    saveHistory(hist);
+    updateHistCount();
+    showToast('Session saved to history');
+  }
+
+  function updateHistCount(){
+    const n=getHistory().length;
+    document.getElementById('histCount').textContent=n?'('+n+')':'';
+  }
+
+  /* ── HISTORY RENDER ── */
+  function renderHistory(){
+    const hist=getHistory();
+    const q=(document.getElementById('histSearch').value||'').toLowerCase();
+    const filtered=q?hist.filter(s=>s.title.toLowerCase().includes(q)||(s.summary||'').toLowerCase().includes(q)||(s.notes||'').toLowerCase().includes(q)):hist;
+    const grid=document.getElementById('histGrid');
+    if(!filtered.length){
+      grid.innerHTML='';
+      document.getElementById('histGrid').parentElement.querySelector('.hist-empty')&&document.getElementById('histGrid').parentElement.querySelector('.hist-empty').remove();
+      const em=document.createElement('div');em.className='hist-empty';
+      em.textContent=hist.length?'No sessions match your search.':'No saved sessions yet. Record a conversation and click "Save to history".';
+      grid.before(em);
+      return;
+    }
+    document.querySelectorAll('.hist-empty').forEach(e=>e.remove());
+    grid.innerHTML=filtered.map(s=>{
+      const d=new Date(s.savedAt);
+      const dateStr=d.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'})+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      const preview=s.summary||(s.transcript&&s.transcript.length?s.transcript[0].text:'No content');
+      const pills=[];
+      if(s.transcript&&s.transcript.length) pills.push(s.transcript.length+' utterances');
+      if(s.wordCount) pills.push(s.wordCount+' words');
+      if(s.summary) pills.push('Summary');
+      if(s.notes) pills.push('Notes');
+      return `<div class="hist-card">
+        <div class="hist-card-head">
+          <div>
+            <div class="hist-card-title">${escHtml(s.title)}</div>
+            <div class="hist-card-date">${dateStr}</div>
+          </div>
+        </div>
+        <div class="hist-card-meta">${pills.map(p=>`<span class="hist-pill">${p}</span>`).join('')}</div>
+        <div class="hist-card-preview">${escHtml(preview)}</div>
+        <div class="hist-card-actions">
+          <button class="btn sm primary" onclick="openDetail('${s.id}')">View</button>
+          <button class="btn sm primary" onclick="restoreFromId('${s.id}')">Restore</button>
+          <button class="btn sm danger" onclick="deleteSession('${s.id}')">Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function showHistList(){
+    document.getElementById('histList').style.display='';
+    document.getElementById('histDetail').style.display='none';
+    currentDetailId=null;
+  }
+
+  function openDetail(id){
+    const hist=getHistory();
+    const s=hist.find(x=>x.id===id);
+    if(!s) return;
+    currentDetailId=id;
+    currentDetailData=s;
+    currentDetailTab='transcript';
+    document.getElementById('detTitle').textContent=s.title;
+    document.getElementById('detDate').textContent=new Date(s.savedAt).toLocaleDateString([],{weekday:'long',day:'numeric',month:'long',year:'numeric'})+' at '+new Date(s.savedAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('histList').style.display='none';
+    document.getElementById('histDetail').style.display='';
+    switchDetailTab('transcript');
+  }
+
+  function switchDetailTab(tab){
+    currentDetailTab=tab;
+    document.querySelectorAll('.detail-tab').forEach((b,i)=>b.classList.toggle('active',['transcript','summary','notes'][i]===tab));
+    const panel=document.getElementById('detPanel');
+    const s=currentDetailData;
+    if(!s) return;
+    if(tab==='transcript'){
+      if(!s.transcript||!s.transcript.length){panel.innerHTML='<span style="color:var(--td);font-style:italic;">No transcript saved.</span>';return;}
+      panel.innerHTML=s.transcript.map(u=>`<div class="utterance"><div class="utt-meta"><span class="spk ${u.cls||'s0'}">${escHtml(u.speaker)}</span><span class="ts">${fmt(u.timestamp)}</span></div><div class="utext">${escHtml(u.text)}</div></div>`).join('');
+    } else if(tab==='summary'){
+      panel.style.whiteSpace='pre-wrap';
+      panel.textContent=s.summary||'No summary saved.';
+    } else {
+      panel.style.whiteSpace='pre-wrap';
+      panel.textContent=s.notes||'No notes saved.';
+    }
+  }
+
+  function restoreFromId(id){
+    const hist=getHistory();
+    const s=hist.find(x=>x.id===id);
+    if(!s) return;
+    doRestore(s);
+  }
+
+  function restoreSession(){
+    if(!currentDetailData) return;
+    doRestore(currentDetailData);
+  }
+
+  function doRestore(s){
+    document.getElementById('sessionTitle').value=s.title||'';
+    transcriptData=s.transcript||[];
+    renderTranscript();
+    const sumPanel=document.getElementById('summaryPanel');
+    if(s.summary){sumPanel.style.whiteSpace='pre-wrap';sumPanel.textContent=s.summary;}
+    else sumPanel.innerHTML='<span class="panel-empty">Click "Generate" after recording to create an AI summary with timestamps.</span>';
+    document.getElementById('notesArea').value=s.notes||'';
+    document.getElementById('btnAnalyse').disabled=!transcriptData.length;
+    showPage('transcribe');
+    showToast('Session restored');
+  }
+
+  function deleteSession(id){
+    showConfirm('Delete session','This session will be permanently removed from history.',()=>{
+      let hist=getHistory();
+      hist=hist.filter(s=>s.id!==id);
+      saveHistory(hist);
+      updateHistCount();
+      renderHistory();
+      showToast('Session deleted');
+    });
+  }
+
+  function deleteCurrentDetail(){
+    if(!currentDetailId) return;
+    showConfirm('Delete session','This session will be permanently removed from history.',()=>{
+      let hist=getHistory();
+      hist=hist.filter(s=>s.id!==currentDetailId);
+      saveHistory(hist);
+      updateHistCount();
+      showHistList();
+      renderHistory();
+      showToast('Session deleted');
+    });
+  }
+
+  function confirmClearAll(){
+    showConfirm('Clear all history','All saved sessions will be permanently deleted. This cannot be undone.',()=>{
+      saveHistory([]);
+      updateHistCount();
+      renderHistory();
+      showToast('History cleared');
+    });
+  }
+
+  function exportDetail(col){
+    const s=currentDetailData;if(!s)return;
+    const title=s.title||'session';
+    let txt='',filename='';
+    if(col==='transcript'){
+      if(!s.transcript||!s.transcript.length){showToast('No transcript to export');return;}
+      txt=s.transcript.map(u=>`[${fmt(u.timestamp)}] [${u.speaker}]\n${u.text}`).join('\n\n');
+      filename=title+'_transcript.txt';
+    } else if(col==='summary'){
+      if(!s.summary){showToast('No summary to export');return;}
+      txt=s.summary; filename=title+'_summary.txt';
+    } else {
+      if(!s.notes){showToast('No notes to export');return;}
+      txt=s.notes; filename=title+'_notes.txt';
+    }
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));a.download=filename;a.click();
+  }
+
+  /* ── confirm modal ── */
+  function showConfirm(title,msg,onOk){
+    document.getElementById('confirmTitle').textContent=title;
+    document.getElementById('confirmMsg').textContent=msg;
+    document.getElementById('confirmOk').onclick=()=>{closeConfirm();onOk();};
+    document.getElementById('confirmModal').classList.add('open');
+  }
+  function closeConfirm(){document.getElementById('confirmModal').classList.remove('open');}
+
+  /* ── paste modal ── */
+  function openPasteModal(){document.getElementById('pasteModal').classList.add('open');document.getElementById('pasteArea').focus();}
+  function closePasteModal(){document.getElementById('pasteModal').classList.remove('open');document.getElementById('pasteArea').value='';}
+  function importPaste(){
+    const raw=document.getElementById('pasteArea').value.trim();
+    if(!raw){alert('Nothing to import.');return;}
+    transcriptData=[];
+    document.getElementById('transcriptPanel').innerHTML='';
+    raw.split('\n').filter(l=>l.trim()).forEach((line,i)=>{
+      const u={speaker:'Speaker A',text:line.trim(),timestamp:i*5,cls:'s0'};
+      transcriptData.push(u);appendUtteranceEl(u);
+    });
+    document.getElementById('btnAnalyse').disabled=false;
+    closePasteModal();autoSave();showToast('Transcript imported');
   }
 
   /* ── speaker switcher ── */
-  function setActiveSpeaker(idx) {
+  function setActiveSpeaker(idx){
     activeSpeaker=idx;
     document.querySelectorAll('.spk-pill').forEach((b,i)=>b.classList.toggle('active',i===idx));
   }
-  function updateSpeakerBar() {
+  function updateSpeakerBar(){
     numSpeakers=parseInt(document.getElementById('speakerCount').value);
-    [0,1,2,3].forEach(i=>{
-      const btn=document.getElementById('spkBtn'+i);
-      if(btn) btn.style.display=i<numSpeakers?'':'none';
-    });
+    [0,1,2,3].forEach(i=>{const b=document.getElementById('spkBtn'+i);if(b)b.style.display=i<numSpeakers?'':'none';});
     if(activeSpeaker>=numSpeakers) setActiveSpeaker(0);
   }
 
   /* ── meter ── */
-  function startMeter(stream) {
+  function startMeter(stream){
     audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-    analyser=audioCtx.createAnalyser(); analyser.fftSize=256;
+    analyser=audioCtx.createAnalyser();analyser.fftSize=256;
     audioCtx.createMediaStreamSource(stream).connect(analyser);
     const buf=new Uint8Array(analyser.frequencyBinCount);
     const bars=[0,1,2,3,4,5,6,7].map(i=>document.getElementById('mb'+i));
@@ -364,97 +652,60 @@
     function draw(){
       analyser.getByteFrequencyData(buf);
       const lv=Math.min(buf.slice(0,40).reduce((a,b)=>a+b,0)/40/128,1);
-      bars.forEach((b,i)=>{
-        const on=lv>(i/8);
-        b.style.background=on?(lv>.7?'#f87171':lv>.4?'#a8c5a0':'#6e9467'):'#3a5c35';
-        b.style.height=(on?hs[i]:4)+'px';
-      });
+      bars.forEach((b,i)=>{const on=lv>(i/8);b.style.background=on?(lv>.7?'#f87171':lv>.4?'#a8c5a0':'#6e9467'):'#3a5c35';b.style.height=(on?hs[i]:4)+'px';});
       meterRaf=requestAnimationFrame(draw);
     }
     draw();
   }
   function stopMeter(){
-    if(meterRaf) cancelAnimationFrame(meterRaf);
+    if(meterRaf)cancelAnimationFrame(meterRaf);
     if(audioCtx){audioCtx.close();audioCtx=null;}
-    [0,1,2,3,4,5,6,7].forEach(i=>{
-      document.getElementById('mb'+i).style.background='#3a5c35';
-      document.getElementById('mb'+i).style.height='4px';
-    });
+    [0,1,2,3,4,5,6,7].forEach(i=>{document.getElementById('mb'+i).style.background='#3a5c35';document.getElementById('mb'+i).style.height='4px';});
   }
 
-  /* ── recording / speech recognition ── */
-  function startRec() {
-    if(!SpeechRecognition){alert('Web Speech API not supported. Try Chrome or Edge.');return;}
+  /* ── recording ── */
+  function startRec(){
+    if(!SR){alert('Web Speech API not supported. Try Chrome or Edge.');return;}
     updateSpeakerBar();
-    recognition=new SpeechRecognition();
-    recognition.continuous=true;
-    recognition.interimResults=true;
-    recognition.lang='en-US';
-
+    recognition=new SR();
+    recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-US';
     recognition.onresult=e=>{
-      if(isPaused) return;
-      let interim='', final='';
+      if(isPaused)return;
+      let interim='',final='';
       for(let i=e.resultIndex;i<e.results.length;i++){
-        const res=e.results[i];
-        if(res.isFinal) final+=res[0].transcript.trim()+' ';
-        else interim+=res[0].transcript;
+        const r=e.results[i];
+        if(r.isFinal)final+=r[0].transcript.trim()+' ';
+        else interim+=r[0].transcript;
       }
-      if(final.trim()){
-        addUtterance(final.trim(), activeSpeaker, secs);
-        removeInterim();
-      }
-      if(interim) showInterim(interim);
+      if(final.trim()){addUtterance(final.trim(),activeSpeaker,secs);removeInterim();}
+      if(interim)showInterim(interim);
     };
-
-    recognition.onerror=e=>{
-      if(e.error==='not-allowed'){alert('Microphone access denied.');}
-      else if(e.error!=='aborted'&&e.error!=='no-speech'){
-        setStatus('Speech error: '+e.error,'');
-      }
-    };
-
-    recognition.onend=()=>{
-      if(isRecognising&&!isPaused){
-        try{recognition.start();}catch(e){}
-      }
-    };
-
+    recognition.onerror=e=>{if(e.error==='not-allowed')alert('Microphone access denied.');else if(e.error!=='aborted'&&e.error!=='no-speech')setStatus('Error: '+e.error,'');};
+    recognition.onend=()=>{if(isRecognising&&!isPaused){try{recognition.start();}catch(e){}}};
     navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
-      startMeter(stream);
-      recognition.start();
-      isRecognising=true; isPaused=false; secs=0;
-      timerInt=setInterval(()=>{ if(!isPaused){secs++;document.getElementById('timer').textContent=fmt(secs);}},1000);
+      startMeter(stream);recognition.start();
+      isRecognising=true;isPaused=false;secs=0;
+      timerInt=setInterval(()=>{if(!isPaused){secs++;document.getElementById('timer').textContent=fmt(secs);}},1000);
       document.getElementById('btnRec').disabled=true;
       document.getElementById('btnPause').disabled=false;
       document.getElementById('btnStop').disabled=false;
       document.getElementById('liveTag').style.display='inline';
       document.getElementById('spkBar').classList.add('visible');
-      setStatus('Live — speaking as '+SNAMES[activeSpeaker],'rec');
-      const panel=document.getElementById('transcriptPanel');
-      if(panel.querySelector('.panel-empty')) panel.innerHTML='';
-    }).catch(()=>alert('Microphone access denied or unavailable.'));
+      setStatus('Live — '+SNAMES[activeSpeaker],'rec');
+      const p=document.getElementById('transcriptPanel');if(p.querySelector('.panel-empty'))p.innerHTML='';
+    }).catch(()=>alert('Microphone access denied.'));
   }
 
   function togglePause(){
     const btn=document.getElementById('btnPause');
-    if(!isPaused){
-      isPaused=true; btn.textContent='Resume';
-      recognition.stop(); isRecognising=false;
-      removeInterim();
-      setStatus('Paused','paused');
-    } else {
-      isPaused=false; btn.textContent='Pause';
-      recognition.start(); isRecognising=true;
-      setStatus('Live — speaking as '+SNAMES[activeSpeaker],'rec');
-    }
+    if(!isPaused){isPaused=true;btn.textContent='Resume';recognition.stop();isRecognising=false;removeInterim();setStatus('Paused','paused');}
+    else{isPaused=false;btn.textContent='Pause';recognition.start();isRecognising=true;setStatus('Live — '+SNAMES[activeSpeaker],'rec');}
   }
 
   function stopRec(){
-    isRecognising=false; isPaused=false;
+    isRecognising=false;isPaused=false;
     if(recognition){try{recognition.stop();}catch(e){}}
-    clearInterval(timerInt);
-    stopMeter();
-    removeInterim();
+    clearInterval(timerInt);stopMeter();removeInterim();
     document.getElementById('timer').textContent='';
     document.getElementById('btnRec').disabled=false;
     document.getElementById('btnPause').disabled=true;
@@ -463,150 +714,86 @@
     document.getElementById('btnAnalyse').disabled=!transcriptData.length;
     document.getElementById('liveTag').style.display='none';
     document.getElementById('spkBar').classList.remove('visible');
-    setStatus('Done','');
-    autoSave();
+    setStatus('Done','');autoSave();
   }
 
-  /* ── utterance management ── */
-  function addUtterance(text, speakerIdx, timestamp) {
-    const u={speaker:SNAMES[speakerIdx], text, timestamp, cls:SCLS[speakerIdx%4]};
-    transcriptData.push(u);
-    appendUtteranceEl(u);
-    autoSave();
+  /* ── utterances ── */
+  function addUtterance(text,spkIdx,timestamp){
+    const u={speaker:SNAMES[spkIdx],text,timestamp,cls:SCLS[spkIdx%4]};
+    transcriptData.push(u);appendUtteranceEl(u);autoSave();
   }
-
-  function appendUtteranceEl(u) {
-    const el=document.getElementById('transcriptPanel');
-    removeInterim();
-    const div=document.createElement('div');
-    div.className='utterance';
-    div.innerHTML=`<div class="utt-meta"><span class="spk ${u.cls||SCLS[SNAMES.indexOf(u.speaker)%4]}">${u.speaker}</span><span class="ts">${fmt(u.timestamp||0)}</span></div><div class="utext">${escHtml(u.text)}</div>`;
-    el.appendChild(div);
-    el.scrollTop=el.scrollHeight;
-    addInterimBack();
+  function appendUtteranceEl(u){
+    const el=document.getElementById('transcriptPanel');removeInterim();
+    const div=document.createElement('div');div.className='utterance';
+    div.innerHTML=`<div class="utt-meta"><span class="spk ${u.cls||'s0'}">${escHtml(u.speaker)}</span><span class="ts">${fmt(u.timestamp)}</span></div><div class="utext">${escHtml(u.text)}</div>`;
+    el.appendChild(div);el.scrollTop=el.scrollHeight;addInterimBack();
   }
-
-  function showInterim(txt) {
+  function showInterim(txt){
     const el=document.getElementById('transcriptPanel');
     if(!interimEl){interimEl=document.createElement('div');interimEl.className='interim-line';el.appendChild(interimEl);}
-    interimEl.textContent=txt;
-    el.scrollTop=el.scrollHeight;
+    interimEl.textContent=txt;el.scrollTop=el.scrollHeight;
   }
   function removeInterim(){if(interimEl){interimEl.remove();interimEl=null;}}
-  function addInterimBack(){if(interimEl){const el=document.getElementById('transcriptPanel');el.appendChild(interimEl);}}
+  function addInterimBack(){if(interimEl){document.getElementById('transcriptPanel').appendChild(interimEl);}}
 
-  function escHtml(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-  /* ── full render (for restore/clear) ── */
   function renderTranscript(){
     const el=document.getElementById('transcriptPanel');
-    if(!transcriptData.length){el.innerHTML='<span class="panel-empty">Transcript appears here in real time as you speak. Use the speaker switcher above to label who is talking.</span>';return;}
-    el.innerHTML=transcriptData.map(u=>`<div class="utterance"><div class="utt-meta"><span class="spk ${u.cls||'s0'}">${u.speaker}</span><span class="ts">${fmt(u.timestamp||0)}</span></div><div class="utext">${escHtml(u.text)}</div></div>`).join('');
+    if(!transcriptData.length){el.innerHTML='<span class="panel-empty">Transcript appears here in real time. Use the speaker switcher to label who is talking.</span>';return;}
+    el.innerHTML=transcriptData.map(u=>`<div class="utterance"><div class="utt-meta"><span class="spk ${u.cls||'s0'}">${escHtml(u.speaker)}</span><span class="ts">${fmt(u.timestamp)}</span></div><div class="utext">${escHtml(u.text)}</div></div>`).join('');
   }
 
-  /* ── paste transcript modal ── */
-  function openPasteModal(){
-    document.getElementById('pasteModal').style.display='flex';
-    document.getElementById('pasteArea').focus();
-  }
-  function closePasteModal(){
-    document.getElementById('pasteModal').style.display='none';
-    document.getElementById('pasteArea').value='';
-  }
-  function importPaste(){
-    const raw=document.getElementById('pasteArea').value.trim();
-    if(!raw){alert('Nothing to import.');return;}
-    const lines=raw.split('\n').filter(l=>l.trim());
-    const panel=document.getElementById('transcriptPanel');
-    panel.innerHTML='';
-    transcriptData=[];
-    lines.forEach((line,i)=>{
-      const u={speaker:'Speaker A',text:line.trim(),timestamp:i*5,cls:'s0'};
-      transcriptData.push(u);
-      appendUtteranceEl(u);
-    });
-    document.getElementById('btnAnalyse').disabled=false;
-    closePasteModal();
-    autoSave();
-    showToast('Transcript imported');
-  }
-
-  /* ── AI analysis (confidence review via Claude) ── */
+  /* ── AI analysis ── */
   async function analyseTranscript(){
     if(!transcriptData.length){alert('No transcript to analyse.');return;}
-    const key=getKey();
-    if(!key){alert('Please enter your Anthropic API key to use AI analysis.');return;}
+    const key=getKey();if(!key){alert('Enter your Anthropic API key first.');return;}
     const loader=document.getElementById('loadTrans');
     document.getElementById('loadTxt').textContent='Analysing with AI...';
     loader.style.display='flex';
     const txt=transcriptData.map(u=>`[${fmt(u.timestamp)}] ${u.speaker}: ${u.text}`).join('\n');
-    const prompt=`Review this speech-to-text transcript for likely errors, unclear phrases, or low-confidence words.
-Return a JSON array with the same structure plus an "uncertain" field.
-Each element: {"speaker":"...","text":"...","timestamp":N,"uncertain":["word or phrase that may be wrong"]}
-If nothing seems uncertain, use an empty array. Only flag genuine likely errors, not stylistic choices.
-Original transcript:\n${txt}`;
+    const prompt=`Review this speech-to-text transcript for likely errors or unclear phrases.\nReturn a JSON array, same structure plus "uncertain" field.\nEach element: {"speaker":"...","text":"...","timestamp":N,"uncertain":["word"]}\nUse empty array if nothing seems wrong.\nOriginal:\n${txt}`;
     try{
       const res=await fetch('https://api.anthropic.com/v1/messages',{
         method:'POST',
         headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
         body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,messages:[{role:'user',content:prompt}]})
       });
-      const d=await res.json();
-      if(d.error) throw new Error(d.error.message);
+      const d=await res.json();if(d.error)throw new Error(d.error.message);
       const raw=(d.content||[]).map(c=>c.text||'').join('');
-      let parsed;
-      try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}
-      catch{parsed=null;}
+      let parsed;try{parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch{parsed=null;}
       if(parsed&&Array.isArray(parsed)){
         transcriptData=parsed.map((u,i)=>({...transcriptData[i],...u}));
-        renderTranscriptWithConfidence();
-        showToast('AI analysis complete');
+        renderWithConfidence();showToast('AI analysis complete');
       }
-    } catch(err){alert('Analysis failed: '+err.message);}
+    }catch(err){alert('Analysis failed: '+err.message);}
     loader.style.display='none';
   }
 
-  function renderTranscriptWithConfidence(){
-    const el=document.getElementById('transcriptPanel');
-    let hasUncertain=false;
+  function renderWithConfidence(){
+    const el=document.getElementById('transcriptPanel');let hasU=false;
     el.innerHTML=transcriptData.map(u=>{
-      const uncertain=Array.isArray(u.uncertain)?u.uncertain:[];
-      if(uncertain.length) hasUncertain=true;
+      const unc=Array.isArray(u.uncertain)?u.uncertain:[];if(unc.length)hasU=true;
       let txt=escHtml(u.text);
-      uncertain.forEach(w=>{
-        if(!w) return;
-        const esc=w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-        txt=txt.replace(new RegExp(`(${esc})`,'gi'),'<span style="background:rgba(180,120,0,.18);border-bottom:1px dashed rgba(140,90,0,.5);border-radius:2px;cursor:help;" title="Low confidence">$1</span>');
-      });
-      return `<div class="utterance"><div class="utt-meta"><span class="spk ${u.cls||'s0'}">${u.speaker}</span><span class="ts">${fmt(u.timestamp||0)}</span></div><div class="utext">${txt}</div></div>`;
-    }).join('')+(hasUncertain?'<div style="font-size:11px;color:rgba(0,0,0,.45);margin-top:8px;"><span style="display:inline-block;width:18px;height:2px;background:rgba(140,90,0,.5);border-top:1px dashed rgba(140,90,0,.5);vertical-align:middle;margin-right:4px;"></span>underlined = possible transcription error</div>':'');
+      unc.forEach(w=>{if(!w)return;const e=w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');txt=txt.replace(new RegExp(`(${e})`,'gi'),'<span style="background:rgba(180,120,0,.18);border-bottom:1px dashed rgba(140,90,0,.5);border-radius:2px;cursor:help;" title="Low confidence">$1</span>');});
+      return `<div class="utterance"><div class="utt-meta"><span class="spk ${u.cls||'s0'}">${escHtml(u.speaker)}</span><span class="ts">${fmt(u.timestamp)}</span></div><div class="utext">${txt}</div></div>`;
+    }).join('')+(hasU?'<div style="font-size:11px;color:rgba(0,0,0,.45);margin-top:8px;">underlined = possible error</div>':'');
   }
 
   /* ── summary ── */
   async function generateSummary(){
     if(!transcriptData.length){alert('No transcript yet.');return;}
-    const key=getKey();
-    if(!key){alert('Please enter your Anthropic API key.');return;}
-    const loader=document.getElementById('loadSumm');
-    const panel=document.getElementById('summaryPanel');
-    loader.style.display='flex'; panel.innerHTML='';
+    const key=getKey();if(!key){alert('Enter your Anthropic API key first.');return;}
+    const loader=document.getElementById('loadSumm'),panel=document.getElementById('summaryPanel');
+    loader.style.display='flex';panel.innerHTML='';
     const txt=transcriptData.map(u=>`[${fmt(u.timestamp||0)}] ${u.speaker}: ${u.text}`).join('\n');
-    const prompt=`Summarise this conversation transcript. Timestamps are [MM:SS].
-Include:
-1. Overview (2-3 sentences)
-2. Key points — reference timestamps naturally e.g. "At 1:24, the team agreed to..."
-3. Action items or decisions with timestamps
-Be concise.\n\nTranscript:\n${txt}`;
+    const prompt=`Summarise this conversation. Timestamps are [MM:SS].\n1. Overview (2-3 sentences)\n2. Key points with timestamps e.g. "At 1:24, ..."\n3. Action items with timestamps\n\nTranscript:\n${txt}`;
     try{
       const res=await fetch('https://api.anthropic.com/v1/messages',{
         method:'POST',
         headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
         body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
       });
-      const d=await res.json();
-      if(d.error) throw new Error(d.error.message);
-      panel.style.whiteSpace='pre-wrap';
-      panel.textContent=(d.content||[]).map(c=>c.text||'').join('');
+      const d=await res.json();if(d.error)throw new Error(d.error.message);
+      panel.style.whiteSpace='pre-wrap';panel.textContent=(d.content||[]).map(c=>c.text||'').join('');
       autoSave();
     }catch(err){panel.textContent='Summary failed: '+err.message;}
     loader.style.display='none';
@@ -614,27 +801,51 @@ Be concise.\n\nTranscript:\n${txt}`;
 
   function clearCol(col){
     if(col==='transcript'){transcriptData=[];renderTranscript();document.getElementById('btnAnalyse').disabled=true;}
-    if(col==='summary') document.getElementById('summaryPanel').innerHTML='<span class="panel-empty">Click "Generate" after recording to create an AI summary with timestamps.</span>';
+    if(col==='summary')document.getElementById('summaryPanel').innerHTML='<span class="panel-empty">Click "Generate" after recording to create an AI summary with timestamps.</span>';
     autoSave();
+  }
+
+  function exportAll(){
+    const title=document.getElementById('sessionTitle').value.trim()||'session';
+    const transcriptTxt=transcriptData.length
+      ? transcriptData.map(u=>`[${fmt(u.timestamp||0)}] [${u.speaker}]\n${u.text}`).join('\n\n')
+      : '(no transcript)';
+    const summaryTxt=document.getElementById('summaryPanel').textContent.trim();
+    const notesTxt=document.getElementById('notesArea').value.trim();
+    if(!transcriptData.length&&!summaryTxt&&!notesTxt){alert('Nothing to export yet.');return;}
+    const date=new Date().toLocaleDateString([],{day:'numeric',month:'long',year:'numeric'});
+    const out=[
+      `SESSION: ${title}`,
+      `DATE: ${date}`,
+      '',
+      '═══════════════════════════════════',
+      'TRANSCRIPT',
+      '═══════════════════════════════════',
+      transcriptTxt,
+      '',
+      '═══════════════════════════════════',
+      'SUMMARY',
+      '═══════════════════════════════════',
+      summaryTxt&&!summaryTxt.startsWith('Click')?summaryTxt:'(no summary)',
+      '',
+      '═══════════════════════════════════',
+      'NOTES & ACTIONS',
+      '═══════════════════════════════════',
+      notesTxt||'(no notes)',
+    ].join('\n');
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([out],{type:'text/plain'}));
+    a.download=title+'_full.txt';
+    a.click();
   }
 
   function exportTxt(col){
     let txt='',filename='';
     const title=document.getElementById('sessionTitle').value.trim()||'session';
-    if(col==='transcript'){
-      if(!transcriptData.length){alert('Nothing to export.');return;}
-      txt=transcriptData.map(u=>`[${fmt(u.timestamp||0)}] [${u.speaker}]\n${u.text}`).join('\n\n');
-      filename=title+'_transcript.txt';
-    } else if(col==='summary'){
-      txt=document.getElementById('summaryPanel').textContent.trim();
-      if(!txt||txt.startsWith('Click')){alert('No summary to export.');return;}
-      filename=title+'_summary.txt';
-    } else if(col==='notes'){
-      txt=document.getElementById('notesArea').value.trim();
-      if(!txt){alert('No notes to export.');return;}
-      filename=title+'_notes.txt';
-    }
-    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'})); a.download=filename; a.click();
+    if(col==='transcript'){if(!transcriptData.length){alert('Nothing to export.');return;}txt=transcriptData.map(u=>`[${fmt(u.timestamp||0)}] [${u.speaker}]\n${u.text}`).join('\n\n');filename=title+'_transcript.txt';}
+    else if(col==='summary'){txt=document.getElementById('summaryPanel').textContent.trim();if(!txt||txt.startsWith('Click')){alert('No summary to export.');return;}filename=title+'_summary.txt';}
+    else if(col==='notes'){txt=document.getElementById('notesArea').value.trim();if(!txt){alert('No notes to export.');return;}filename=title+'_notes.txt';}
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));a.download=filename;a.click();
   }
 
   function copyNotes(){
@@ -645,8 +856,7 @@ Be concise.\n\nTranscript:\n${txt}`;
 
   document.getElementById('sessionTitle').addEventListener('input',autoSave);
   document.getElementById('speakerCount').addEventListener('change',updateSpeakerBar);
-  loadSaved();
-  updateSpeakerBar();
+  loadCurrent();updateSpeakerBar();updateHistCount();
 </script>
 </body>
 </html>
