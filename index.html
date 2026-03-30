@@ -174,8 +174,7 @@
     <button class="btn" id="btnPause" onclick="togglePause()" disabled>Pause</button>
     <button class="btn warn" id="btnStop" onclick="stopRec()" disabled>Stop</button>
     <button class="btn blue" id="btnAnalyse" onclick="analyseTranscript()" disabled title="Send transcript to Claude for confidence review">Analyse with AI</button>
-    <button class="btn" onclick="document.getElementById('fileIn').click()">Upload audio</button>
-    <input type="file" id="fileIn" accept="audio/*" style="display:none" onchange="handleFile(event)">
+    <button class="btn" onclick="openPasteModal()">Paste transcript</button>
     <div class="meter-wrap" id="meterWrap">
       <div class="mb" id="mb0"></div><div class="mb" id="mb1"></div><div class="mb" id="mb2"></div><div class="mb" id="mb3"></div>
       <div class="mb" id="mb4"></div><div class="mb" id="mb5"></div><div class="mb" id="mb6"></div><div class="mb" id="mb7"></div>
@@ -242,6 +241,28 @@
       <textarea class="notes-area" id="notesArea"
         placeholder="Enter notes, actions, follow-ups...&#10;&#10;Tip: Copy then paste into Windows Sticky Notes (Win+W)"
         oninput="autoSave()"></textarea>
+    </div>
+  </div>
+</div>
+
+<style>
+  #pasteModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200; align-items:center; justify-content:center; }
+  .paste-card { background:#111a11; border:1px solid var(--bg); border-radius:var(--rlg); padding:20px; width:520px; max-width:90vw; display:flex; flex-direction:column; gap:12px; }
+  .paste-card h3 { font-size:14px; font-weight:500; color:var(--tg); }
+  .paste-card p { font-size:12px; color:var(--tm); line-height:1.6; }
+  #pasteArea { width:100%; height:200px; background:#0a0a0a; border:1px solid var(--td); border-radius:var(--rmd); padding:10px; color:var(--tg); font-size:13px; font-family:var(--font); resize:vertical; outline:none; line-height:1.6; }
+  #pasteArea:focus { border-color:var(--tm); }
+  .paste-actions { display:flex; gap:8px; justify-content:flex-end; }
+</style>
+
+<div id="pasteModal">
+  <div class="paste-card">
+    <h3>Paste existing transcript</h3>
+    <p>Paste any existing transcript text below — one line per sentence or turn. Use "Analyse with AI" after importing to add speaker labels and confidence flags.</p>
+    <textarea id="pasteArea" placeholder="Paste transcript text here..."></textarea>
+    <div class="paste-actions">
+      <button class="btn" onclick="closePasteModal()">Cancel</button>
+      <button class="btn primary" onclick="importPaste()">Import</button>
     </div>
   </div>
 </div>
@@ -483,12 +504,31 @@
     el.innerHTML=transcriptData.map(u=>`<div class="utterance"><div class="utt-meta"><span class="spk ${u.cls||'s0'}">${u.speaker}</span><span class="ts">${fmt(u.timestamp||0)}</span></div><div class="utext">${escHtml(u.text)}</div></div>`).join('');
   }
 
-  /* ── file upload — use Claude for transcription (still sends as document workaround isn't supported, so we show a helpful message) ── */
-  function handleFile(e){
-    const file=e.target.files[0];
-    if(!file) return;
-    e.target.value='';
-    alert('File upload transcription via the Claude API is currently unsupported due to browser API limitations.\n\nFor best results:\n• Use the live recording feature (Chrome/Edge)\n• Or paste your existing transcript text directly into the Transcript panel');
+  /* ── paste transcript modal ── */
+  function openPasteModal(){
+    document.getElementById('pasteModal').style.display='flex';
+    document.getElementById('pasteArea').focus();
+  }
+  function closePasteModal(){
+    document.getElementById('pasteModal').style.display='none';
+    document.getElementById('pasteArea').value='';
+  }
+  function importPaste(){
+    const raw=document.getElementById('pasteArea').value.trim();
+    if(!raw){alert('Nothing to import.');return;}
+    const lines=raw.split('\n').filter(l=>l.trim());
+    const panel=document.getElementById('transcriptPanel');
+    panel.innerHTML='';
+    transcriptData=[];
+    lines.forEach((line,i)=>{
+      const u={speaker:'Speaker A',text:line.trim(),timestamp:i*5,cls:'s0'};
+      transcriptData.push(u);
+      appendUtteranceEl(u);
+    });
+    document.getElementById('btnAnalyse').disabled=false;
+    closePasteModal();
+    autoSave();
+    showToast('Transcript imported');
   }
 
   /* ── AI analysis (confidence review via Claude) ── */
